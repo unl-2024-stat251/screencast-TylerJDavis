@@ -67,7 +67,12 @@ team_data <- big_table %>%
   summarize(team_w = mean(weight_in_pounds), team_h = mean(height_in_inches))
 final_team <- inner_join(teams,team_data, by = 'team_code')
 head(final_team)
-#need to think of how I want to visualize this graph still not quite sure. 
+final_team_graph <- final_team %>%
+  mutate(season = as.numeric(season))%>%
+  filter(season > 19992000 & team_code == "CHI")%>%
+  ggplot(aes(season,team_h)) + geom_point() + geom_vline(xintercept = 20092010, linetype = "solid", color = "blue", size = .7)+geom_vline(xintercept = 20122013, linetype = "solid", color = "blue", size = .7) + geom_vline(xintercept = 20142015, linetype = "solid", color = "blue", size = .7) + ggtitle("How Height Relates to Titles") + xlab("Season") + ylab("Height in Inches")
+final_team_graph
+
 
 
 #topic 2
@@ -82,6 +87,7 @@ birth_year <- inner_join(rosters3,year_count, by = 'year')
 head(birth_year)
 birth_year_graph <- birth_year %>%
   filter(year > 1995)
-ggplot(birth_year_graph, aes(year, n)) + geom_col() +scale_y_log10()
-# need to think about how to visualize this graph as well. 
+colnames(birth_year_graph)[colnames(birth_year_graph) == 'n']<-'Count'
+ggplot(birth_year_graph, aes(year, avg_w_p,size = Count)) + geom_count() + ggtitle("Average Weight per Birth Year in the NHL from 1995 - 2005") + xlab("Birth Year") + ylab("Average Weight in Pounds") + labs(size = "Count of Hockey Players Born per Year")
+
 ```
