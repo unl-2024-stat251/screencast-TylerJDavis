@@ -50,13 +50,16 @@ players_graph
 
 #topic number 2 Data
 rosters[c('year','month','day')] = str_split_fixed(rosters$birth_date,"-",3)
-rosters_t2 <- rosters %>%
+roster_new <- rosters[!duplicated(rosters$player_id), ]
+rosters_t2 <- roster_new %>%
   drop_na()%>%
   filter(birth_country == "CAN")%>%
   group_by(year) %>%
   summarize(avg_h_i = mean(height_in_inches), avg_w_p = mean(weight_in_pounds), avg_w_k = mean(weight_in_kilograms), avg_h_c = mean(height_in_centimeters))
-year_count <- rosters %>%
-  count(year)
+year_count <- roster_new %>%
+  filter(birth_country == "CAN") %>%
+  group_by(year)%>%
+  summarize(year_count = n())
 birth_year <- inner_join(rosters_t2,year_count, by = 'year')
 head(birth_year)
 
@@ -73,7 +76,7 @@ head(birth_year)
 birth_year_graph <- birth_year %>%
   filter(year > 1995)
 colnames(birth_year_graph)[colnames(birth_year_graph) == 'n'] <- 'Count'
-ggplot(birth_year_graph,aes(year,avg_w_p, size = Count)) + geom_count() + ggtitle("Average Weight per Birth Year in the NHL from 1995 - 2005") + ylab("Average Weight in Pounds") + xlab("Year")
+ggplot(birth_year_graph,aes(year,avg_w_p, size = year_count)) + geom_count() + ggtitle("Average Weight per Birth Year in the NHL from 1995 - 2005 for Canadian Born Players") + ylab("Average Weight in Pounds") + xlab("Year")
   
 
 
